@@ -1,3 +1,5 @@
+require "middleman-core"
+
 class ThumbnailGenerator < Middleman::Extension
   def initialize(app, options_hash={}, &block)
     super
