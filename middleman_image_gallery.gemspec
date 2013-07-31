@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'middleman_image_gallery/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "middleman_image_gallery"
+  gem.name          = "middleman-image-gallery"
   gem.version       = MiddlemanImageGallery::VERSION
   gem.authors       = ["Steve Gehrman"]
   gem.email         = ["sgehrman@gmail.com"]
