@@ -11,4 +11,4 @@ class ThumbnailGenerator < Middleman::Extension
   end
 end
 
-::Middleman::Extensions.register(:image-gallery, ThumbnailGenerator)
+::Middleman::Extensions.register(:image_gallery, ThumbnailGenerator)
