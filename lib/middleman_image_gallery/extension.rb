@@ -1,6 +1,6 @@
 require "middleman-core"
 
-class ThumbnailGenerator < Middleman::Extension
+class Middleman::ThumbnailGenerator < Middleman::Extension
   def initialize(app, options_hash={}, &block)
     super
 
@@ -13,4 +13,4 @@ class ThumbnailGenerator < Middleman::Extension
   alias :included :registered
 end
 
-::Middleman::Extensions.register(:image_gallery, ThumbnailGenerator)
+::Middleman::Extensions.register(:image_gallery, Middleman::ThumbnailGenerator)
