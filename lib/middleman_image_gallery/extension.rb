@@ -48,14 +48,39 @@ module Middleman
   end
 
   module HelperMethods
-    def gallery_images(opts={})
-      renderr
+    def gallery_images(data, name, opts={})
+      result = ''
+      galleryFolderName = "gallery"
+
+      src = File.join(source_dir, settings.images_dir, galleryFolderName, name)
+
+      file_types = [:jpg, :jpeg, :png]
+      glob = "#{src}/*.{#{file_types.join(',')}}"
+      files = Dir[glob]
+
+      files.each do |file|
+        base = File.basename(file, '.*')
+
+        caption = 'unknown'
+        obj = data[name][base]
+        caption = obj.caption if obj.present?
+
+        result += make_image_tag(file.gsub(source_dir, ''), caption)
+      end
+
+      result.html_safe
     end
 
     private
 
-    def renderr
-      'fuck yah'
+    def make_image_tag(path, caption)
+      result = image_tag path, :alt => "a picture"
+
+      if !caption.blank?
+        result << "<p> #{caption} </p>".html_safe   # result is SafeBuffer
+      end
+
+      result
     end
 
   end
