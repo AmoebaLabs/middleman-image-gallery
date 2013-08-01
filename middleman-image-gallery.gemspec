@@ -19,4 +19,6 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency("middleman-core", [">= 3.0.0"])
   gem.add_dependency("middleman-more", [">= 3.0.0"])
+  gem.add_dependency("rmagick", ["~> 2.13.0"])
+
 end

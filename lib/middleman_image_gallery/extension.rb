@@ -1,42 +1,47 @@
 require "middleman-core"
+require 'middleman_image_gallery/thumbnail_generator'
 
 module Middleman
 
-  class ThumbnailGenerator < Extension
+  class ThumbnailExtension < Extension
     def initialize(app, options_hash={}, &block)
       super
 
-      #app.after_build do |builder|
-      #  puts '#### yeah!! ####'
-      #end
-      #
-
-      dimensions = options[:dimensions]
-      namespace = options[:namespace_directory].join(',')
-
-      dir = Pathname.new(File.join(source_dir, images_dir))
-
+      # after build callback
       app.after_build do |builder|
-
-        puts 'building...'
-
-        file_types = [:jpg, :jpeg, :png]
-
-        glob = "#{dir}/#{namespace}/*.{#{file_types.join(',')}}"
-        files = Dir[glob]
-
-        files.each do |file|
-          path = file.gsub(source_dir, '')
-
-          puts path
-
-        end
       end
 
-
+      # after configuration callback
+      app.after_configuration do
+        ThumbnailExtension.createThumbnails(self)
+      end
     end
+
+    private
+
+    def self.createThumbnails(app)
+      src = Pathname.new(File.join(app.source_dir, app.settings.images_dir, 'gallery'))
+
+      file_types = [:jpg, :jpeg, :png]
+
+      glob = "#{src}/*.{#{file_types.join(',')}}"
+      files = Dir[glob]
+
+      files.each do |file|
+        filename = File.basename(file)
+
+        dimensions = { small: '200x' }
+
+        thumbsDirectory = Pathname.new(File.join(src, "thumbnails"))
+        thumbsDirectory.mkpath()
+
+        specs = ThumbnailGenerator.specs(filename, dimensions)
+        ThumbnailGenerator.generate(src, thumbsDirectory, filename, specs)
+      end
+    end
+
   end
 
 end
 
-::Middleman::Extensions.register(:image_gallery, Middleman::ThumbnailGenerator)
+::Middleman::Extensions.register(:image_gallery, Middleman::ThumbnailExtension)
