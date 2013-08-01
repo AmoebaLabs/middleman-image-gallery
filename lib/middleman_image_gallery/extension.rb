@@ -7,20 +7,25 @@ module Middleman
     def initialize(app, options_hash={}, &block)
       super
 
+      # append helper methods
+      app.helpers Middleman::HelperMethods
+
       # after build callback
       app.after_build do |builder|
+        ThumbnailExtension.createThumbnails(self)
       end
 
       # after configuration callback
       app.after_configuration do
-        ThumbnailExtension.createThumbnails(self)
       end
     end
 
     private
 
     def self.createThumbnails(app)
-      src = Pathname.new(File.join(app.source_dir, app.settings.images_dir, 'gallery'))
+      galleryFolderName = "gallery"
+
+      src = Pathname.new(File.join(app.source_dir, app.settings.images_dir, galleryFolderName))
 
       file_types = [:jpg, :jpeg, :png]
 
@@ -32,7 +37,7 @@ module Middleman
 
         dimensions = { small: '200x' }
 
-        thumbsDirectory = Pathname.new(File.join(src, "thumbnails"))
+        thumbsDirectory = Pathname.new(File.join(app.root, app.settings.build_dir, app.settings.images_dir, galleryFolderName, "thumbnails"))
         thumbsDirectory.mkpath()
 
         specs = ThumbnailGenerator.specs(filename, dimensions)
@@ -42,6 +47,21 @@ module Middleman
 
   end
 
+  module HelperMethods
+    def gallery_images(opts={})
+      renderr
+    end
+
+    private
+
+    def renderr
+      'fuck yah'
+    end
+
+  end
+
 end
 
 ::Middleman::Extensions.register(:image_gallery, Middleman::ThumbnailExtension)
+
+
