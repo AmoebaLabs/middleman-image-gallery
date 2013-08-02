@@ -65,7 +65,11 @@ module Middleman
         obj = data[name][base]
         caption = obj.caption if obj.present?
 
-        result += make_image_tag(file.gsub(source_dir, ''), caption)
+
+        # result += make_image_tag(file.gsub(source_dir, ''), caption)
+         make_image_tagg(file.gsub(source_dir, ''), caption)
+
+
       end
 
       result.html_safe
@@ -74,14 +78,24 @@ module Middleman
     private
 
     def make_image_tag(path, caption)
-      result = image_tag path, :alt => "a picture"
+      result = content_tag(:a, image_tag(path, alt: "a picture", class: 'gallery-item'), href: 'http://www.padrinorb.com')
 
-      if !caption.blank?
-        result << "<p> #{caption} </p>".html_safe   # result is SafeBuffer
+      result
+    end
+
+
+    def make_image_tagg(path, caption)
+      result = content_tag(:a, href: 'http://www.padrinorb.com') do
+        image_tag(path, alt: "a picture", class: 'gallery-item')
       end
 
       result
     end
+
+
+
+
+
 
   end
 
