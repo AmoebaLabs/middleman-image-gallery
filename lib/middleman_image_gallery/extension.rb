@@ -25,31 +25,35 @@ module Middleman
     def self.createThumbnails(app)
       galleryFolderName = "gallery"
 
-      src = Pathname.new(File.join(app.source_dir, app.settings.images_dir, galleryFolderName))
+      collectionFolder = Pathname.new(File.join(app.root, app.build_dir, app.settings.images_dir, galleryFolderName))
 
-      file_types = [:jpg, :jpeg, :png]
+      collectionFolder.children.each do |galleryFolder|
+        aName = galleryFolder.basename.to_s
 
-      glob = "#{src}/*.{#{file_types.join(',')}}"
-      files = Dir[glob]
+        if galleryFolder.directory?
+          # create thumbnails directory to write thumbnails
+          thumbsDirectory = Pathname.new(File.join(galleryFolder, "thumbnails"))
+          thumbsDirectory.mkpath() if not thumbsDirectory.exist?
 
-      files.each do |file|
-        filename = File.basename(file)
+          galleryFolder.children.each do |file|
+            if file.file? && HelperMethods::gallery_image?(file.basename.to_s)
+              dimensions = { small: '200x' }
 
-        dimensions = { small: '200x' }
-
-        thumbsDirectory = Pathname.new(File.join(app.root, app.settings.build_dir, app.settings.images_dir, galleryFolderName, "thumbnails"))
-        thumbsDirectory.mkpath()
-
-        specs = ThumbnailGenerator.specs(filename, dimensions)
-        ThumbnailGenerator.generate(src, thumbsDirectory, filename, specs)
+              specs = ThumbnailGenerator.specs(file.basename().to_s, dimensions)
+              ThumbnailGenerator.generate(galleryFolder.to_s, thumbsDirectory.to_s, file.basename().to_s, specs)
+            end
+          end
+        end
       end
     end
-
   end
 
   module HelperMethods
+    def self.gallery_image?(name)
+      !(name =~ /\.(?:jpe?g|png|gif)$/i).nil?
+    end
+
     def gallery_images(data, name, opts={})
-      result = ''
       galleryFolderName = "gallery"
 
       src = File.join(source_dir, settings.images_dir, galleryFolderName, name)
@@ -58,6 +62,7 @@ module Middleman
       glob = "#{src}/*.{#{file_types.join(',')}}"
       files = Dir[glob]
 
+      itemsContent = ''
       files.each do |file|
         base = File.basename(file, '.*')
 
@@ -65,25 +70,33 @@ module Middleman
         obj = data[name][base]
         caption = obj.caption if obj.present?
 
-        result += make_image_tag(file.gsub(source_dir, ''), caption)
+        itemsContent += make_image_tag(file.gsub(source_dir, ''), caption)
       end
 
-      result.html_safe
+      # gallery wrapping div
+      content = content_tag(:div, itemsContent, class: 'gallery')
+
+      content
     end
 
     private
 
     def make_image_tag(path, caption)
+
+      # get thumbnail if it exists
+      thumbnail = ''
+      thumbnail = path if thumbnail.blank?
+
       # create image
-      content = image_tag(path, alt: "a picture")
+      content = image_tag(thumbnail, alt: "a picture")
 
       # append a p tag for the caption
-      caption = '(nothing)' if caption.blank?
+      caption = path if caption.blank?
 
       content << content_tag(:p, caption)
 
       # wrap link around image
-      content = content_tag(:a, content, href: 'http://www.padrinorb.com')
+      content = content_tag(:a, content, href: path)
 
       # wrap content up in a final wrapper div
       content = content_tag(:div, content, class: 'gallery-item')
