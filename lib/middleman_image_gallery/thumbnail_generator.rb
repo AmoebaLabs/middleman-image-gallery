@@ -7,12 +7,19 @@ module Middleman
 
       def specs(origin, dimensions)
         ret = {original: {name: origin}}
+
         file_parts = origin.split('.')
         basename = file_parts[0..-2].join('.')
         ext = file_parts.last
 
+        # use same destination name if only one dimension
+        add_info_to_destination_names = true
+        if dimensions.count == 1
+          add_info_to_destination_names = false
+        end
+
         dimensions.each do |name, dimension|
-          ret[name] = {name: "#{basename}-#{name}-#{dimension}.#{ext}", dimensions: dimension}
+          ret[name] = {name: add_info_to_destination_names ? "#{basename}-#{name}-#{dimension}.#{ext}" : origin, dimensions: dimension}
         end
 
         ret
