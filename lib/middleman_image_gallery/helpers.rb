@@ -75,10 +75,14 @@ module Middleman
       thumbnailPath = ''
       thumbnailPath = thumbnameFile.to_s.gsub(@app.source_dir, '') if thumbnameFile.exist?
 
-      thumbnailPath = path if thumbnailPath.blank?
+      image_options = {alt: "img alt text"}
+      if thumbnailPath.blank?
+        thumbnailPath = path
+        image_options[:width] = "200"
+      end
 
       # create image
-      content = @app.image_tag(thumbnailPath, alt: "a picture")
+      content = @app.image_tag(thumbnailPath, image_options)
 
       # append a p tag for the caption
       caption = path if caption.blank?
