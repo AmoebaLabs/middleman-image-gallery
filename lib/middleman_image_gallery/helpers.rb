@@ -84,13 +84,13 @@ module Middleman
       # create image
       content = @app.image_tag(thumbnailPath, image_options)
 
+      # wrap link around image
+      content = @app.content_tag(:a, content, href: path)
+
       # append a p tag for the caption
       caption = path if caption.blank?
 
       content << @app.content_tag(:p, caption)
-
-      # wrap link around image
-      content = @app.content_tag(:a, content, href: path)
 
       # wrap content up in a final wrapper div
       content = @app.content_tag(:div, content, class: 'gallery-item')
